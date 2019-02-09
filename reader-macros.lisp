@@ -1,0 +1,33 @@
+(in-package #:uncommon-lisp)
+
+(defmacro in-syntax-kick-reader-macros ()
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+    (setq *readtable* (copy-readtable nil))
+    (make-dispatch-macro-character #\!)
+    (set-dispatch-macro-character #\! #\( #'|!( READER|)
+    (set-dispatch-macro-character #\! #\' #'|!' READER|)
+    (set-dispatch-macro-character #\! #\` #'|!` READER|)
+    (set-dispatch-macro-character #\! #\$ #'|!$ READER|)
+    (values)))
+
+(defun |!( READER| (stream char n-arg)
+  (declare (ignore char n-arg))
+  (let ((*readtable* (copy-readtable *readtable*)))
+    (setf (readtable-case *readtable*) :preserve)
+    (funcall (get-macro-character #\() stream #\()))
+
+(defun |!' READER| (stream char n-arg)
+  (declare (ignore char n-arg))
+  (let ((*readtable* (copy-readtable *readtable*)))
+    (setf (readtable-case *readtable*) :preserve)
+    (funcall (get-macro-character #\') stream #\')))
+
+(defun |!` READER| (stream char n-arg)
+  (declare (ignore char n-arg))
+  (let ((*readtable* (copy-readtable *readtable*)))
+    (setf (readtable-case *readtable*) :preserve)
+    (funcall (get-macro-character #\`) stream #\`)))
+
+(defun |!$ READER| (stream char n-arg)
+  (declare (ignore char))
+  `(sh ,(|!` READER| stream #\` n-arg)))
