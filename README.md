@@ -1,1 +1,1 @@
-My own lisp utilities, with much stolen from /On Lisp/ by Paul Graham.
+My own lisp utilities, with much stolen from _On Lisp_ by Paul Graham.
